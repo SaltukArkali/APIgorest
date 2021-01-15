@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 import utilities.ConfigReader;
 import utilities.ReusableMethods;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,9 +207,44 @@ public class Post01Example {
         }
     }
 
+    @Test
+    public void post12(){ // TC 0211
 
+        List<Object>allKindsOfWrongData = new ArrayList<>();
+        allKindsOfWrongData.add(123);
+        allKindsOfWrongData.add("aliveli");
+        allKindsOfWrongData.add("aliveli@");
+        allKindsOfWrongData.add('h');
+        allKindsOfWrongData.add(12.956);
+        allKindsOfWrongData.add(12+"aliveli");
+        for(int i=0;i<allKindsOfWrongData.size();i++){
+            myPostData.put("name",ReusableMethods.randomString(6));
+            myPostData.put("email",allKindsOfWrongData.get(i));
+            myPostData.put("gender","Female");
+            myPostData.put("status","Active");
 
+            postMethod(myPostData);
+            jsonPath = response.jsonPath();
 
+            Assert.assertEquals(jsonPath.getString("data[0].field"), "email");
+            Assert.assertEquals(jsonPath.getString("data[0].message"), "is invalid");
+        }
+    }
 
+    @Test
+    public void post13(){ // TC 0217
+        myPostData.put("name", 666);
+        myPostData.put("email",ReusableMethods.randomString(5)+"@live.com");
+        myPostData.put("gender","Female");
+        myPostData.put("status",null);
+        postMethod(myPostData);
+        jsonPath = response.jsonPath();
+        String myResponseDataStatus = jsonPath.getString("data.field[0]");
+        System.out.println(myResponseDataStatus);
+        String myResponseDataMessage = jsonPath.getString("data.message[0]");
+        System.out.println(myResponseDataMessage);
 
+        Assert.assertEquals(myResponseDataStatus,"status");
+        Assert.assertEquals(myResponseDataMessage,"can't be blank");
+    }
 }
