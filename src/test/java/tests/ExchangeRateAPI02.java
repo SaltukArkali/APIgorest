@@ -5,75 +5,106 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import org.junit.Assert;
 import org.junit.Test;
-import org.testng.Assert;
-import pojos.Money;
-import pojos.Rates;
-
+import pojos.Money2;
+import pojos.Rates2;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
-
+import java.util.TreeMap;
 import static io.restassured.RestAssured.given;
 
 public class ExchangeRateAPI02 {
+
     Response response;
-    String endPoint = "https://api.exchangeratesapi.io/latest";
+    String endPoint = " https://api.exchangeratesapi.io/2010-01-12";
     JsonPath json;
-    Money money;
-    Rates rates;
+    Money2 money;
+    Rates2 rates;
     ObjectMapper objectMapper = new ObjectMapper();
 
     public void getResponse() {
         response = given().accept(ContentType.JSON).when().get(endPoint);
-//      response.prettyPrint();
+        response.prettyPrint();
     }
-
     @Test
-    public void TC01() throws JsonProcessingException {
-        //    (Pojo Ile Yapilacak)
-//    Kullanici aktuel döviz referans oranlarını alabilmali ve
-//    asagidakilerini sirasiyla yapabilmelidir.
-//         * Status kodunun 200 oldugunu,
-//            * "rates" in icinde  ==> - "CAD": 1.5394,
-//            -  "USD": 1.2127,
-//            -  "TRY": 8.5503, para birmlerinin bulundugugunu ve
-//    karsisinda sözkonusu yukardaki degerlerin oldugunu (verify)
-//         * "base" in ==>  "EUR" oldugunu,
-//            * "date" in ==>   Rate'lerin alindigi (testinin yapildigi) gündeki "yil/ay/gun" tarih zaman
-//    dilimi oldugunu.(verify)
+    public void TC0201() throws JsonProcessingException {
+//        (Pojo nun pekismesi icin Pojo ile yapilacak)
+//        Kullanici 2010-01-12 tarihindeki döviz referans oranlarını alabilmali ve
+//        asagidakilerini sirasiyla yapabilmelidir.
+//                * Status kodunun 200 oldugunu,
+//         * "rates" in icinde  ==> - "TRY": 2.1084,
+//                -  "CZK": 26.258,
+//                -  "PLN": 4.0838, para birmlerinin bulundugunu ve
+//        karsisinda sözkonusu yukardaki degerlerin oldugunu (verify)
+//                * "base" in ==>  "EUR" oldugunu,
+//         * "date" in ==>   2010-01-12 "yil/ay/gun" tarih zaman
+//        dilimi oldugunu.(verify)
         getResponse();
         response.then().assertThat().statusCode(200);
 
-        money = objectMapper.readValue(response.asString(), Money.class);
+        money = objectMapper.readValue(response.asString(), Money2.class);
         System.out.println(money.getRates());
 
-        Assert.assertTrue(money.getRates().getCAD() == 1.5418f);
-        Assert.assertTrue(money.getRates().getUSD() == 1.2108f);
-        Assert.assertTrue(money.getRates().getTRY() == 8.501f);
-        Assert.assertEquals(money.getBase(), "EUR");
-        Assert.assertEquals(money.getDate(), "2021-02-12");
+        Assert.assertTrue(money.getRates().getTRY()==2.1084f);
+        Assert.assertTrue(money.getRates().getCZK()==26.258f);
+        Assert.assertTrue(money.getRates().getPLN()==4.0838f);
+        Assert.assertTrue(money.getBase().equals("EUR"));
+        Assert.assertEquals(money.getDate(),"2010-01-12");
 
     }
-
     @Test
-    public void TC02() {
-//         * "EUR" ya göre en yüksek rate'in (en degerli paranin) ==>"GBP"para birimi oldugu ve
-//        rate'in ise  0.8765'oldugunu (verify)
+    public void TC0202() {
+
+//     * "EUR" ya göre en yüksek 3'üncü rate'in (en degerli paranin) ==>"USD"para birimi oldugu ve
+//    rate'inin ise  1.4481'oldugunu,
+//     - ayrica söz konusu tarihteki  en düsük para biriminin "HUF" oldugunu ve
+//     degerinin ise 268.18 oldugunu(verify)
+
+//        jsonPath = myResponse(endPoint).jsonPath();
+//        Map<String,Integer> myRates = jsonPath.getMap("rates");
+//        TreeMap<String,Integer>myOrderedRates = new TreeMap<>(myRates);
+//        System.out.println(myOrderedRates);
+//        //kucukten buyuge
+//        LinkedHashMap<String, Integer> sortedMap = new LinkedHashMap<>();
+//        myOrderedRates.entrySet()
+//                .stream()
+//                .sorted(Map.Entry.comparingByValue())
+//                .forEachOrdered(x -> sortedMap.put(x.getKey(), x.getValue()));
+//        System.out.println(sortedMap);
+//        //buyukten kucuge
+//        LinkedHashMap<String, Integer> reverseSortedMap = new LinkedHashMap<>();
+//        myOrderedRates.entrySet()
+//                .stream()
+//                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+//                .forEachOrdered(x -> reverseSortedMap.put(x.getKey(), x.getValue()));
+//        System.out.println(reverseSortedMap);
 
         getResponse();
-        json = response.jsonPath();
-        Map<String, Float> allRates = json.getMap("rates");
+        json= response.jsonPath();
 
-        float euro = 1.0F;
-        for (String currencyKey : allRates.keySet()) {
-            float rate = allRates.get(currencyKey);
+        Map<String,Double> allRates = json.getMap("rates");
+        Map<String,Double> treeMap = new TreeMap<>(allRates);
 
-            if (currencyKey.toUpperCase().equals("GBP")) {
-                Assert.assertTrue(euro > rate);
-            } else {
-                Assert.assertTrue(euro < rate);
-            }
-        }
+        Map<String,Double> sortedMap = new LinkedHashMap<>();
+        System.out.println("Tree Map : " + treeMap);
+
+        treeMap.entrySet().stream().sorted(Map.Entry.comparingByValue()).
+                forEachOrdered(t->sortedMap.put(t.getKey(),t.getValue()));
+        System.out.println("Sorted Map : " +sortedMap);
+
+        Object[] allKeys = sortedMap.keySet().toArray();
+        System.out.println("Arraylist hali : " +Arrays.toString(allKeys));
+
+        String thirdCurrency = allKeys[2].toString();
+        System.out.println("Actual Third Currency : " + thirdCurrency);
+        System.out.println("Actual Third Currency : " + sortedMap.get(thirdCurrency));
+        Assert.assertEquals(thirdCurrency,"USD");
+
+
+
+
     }
-
 
 }

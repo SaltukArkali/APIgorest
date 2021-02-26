@@ -1,28 +1,34 @@
 package tests;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import org.junit.Test;
 import org.testng.Assert;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import pojos.Money;
+import pojos.Rates;
+
 import java.util.Map;
+
 import static io.restassured.RestAssured.given;
 
-public class ExchangeRateAPI01 {
+public class ExchangeRateAPI02Onceki {
     Response response;
     String endPoint = "https://api.exchangeratesapi.io/latest";
     JsonPath json;
-    List<Integer> exchangeRateList = new ArrayList<>();
+    Money money;
+    Rates rates;
+    ObjectMapper objectMapper = new ObjectMapper();
 
-    public void getResponse(){
+    public void getResponse() {
         response = given().accept(ContentType.JSON).when().get(endPoint);
 //      response.prettyPrint();
-   }
+    }
+
     @Test
-    public void TC01(){
+    public void TC01() throws JsonProcessingException {
         //    (Pojo Ile Yapilacak)
 //    Kullanici aktuel döviz referans oranlarını alabilmali ve
 //    asagidakilerini sirasiyla yapabilmelidir.
@@ -35,52 +41,39 @@ public class ExchangeRateAPI01 {
 //            * "date" in ==>   Rate'lerin alindigi (testinin yapildigi) gündeki "yil/ay/gun" tarih zaman
 //    dilimi oldugunu.(verify)
         getResponse();
-        Assert.assertEquals(response.getStatusCode(),200);
-        json=response.jsonPath();
-        System.out.println(json.getString("rates"));
+        response.then().assertThat().statusCode(200);
 
-        String cadValue = json.getString("rates.CAD");
-        String usdValue = json.getString("rates.USD");
-        String tryValue = json.getString("rates.TRY");
-        Assert.assertTrue(cadValue.equals("1.5418"));
-        Assert.assertTrue(usdValue.equals("1.2108"));
-        Assert.assertTrue(tryValue.equals("8.501"));
+        money = objectMapper.readValue(response.asString(), Money.class);
+        System.out.println(money.getRates());
 
-        System.out.println(json.getString("base"));
-        Assert.assertEquals(json.getString("base"),"EUR");
-        System.out.println(json.getString("date"));
-        Assert.assertEquals(json.getString("date"),"2021-02-12");
+        Assert.assertTrue(money.getRates().getCAD() == 1.5418f);
+        Assert.assertTrue(money.getRates().getUSD() == 1.2108f);
+        Assert.assertTrue(money.getRates().getTRY() == 8.501f);
+        Assert.assertEquals(money.getBase(), "EUR");
+        Assert.assertEquals(money.getDate(), "2021-02-12");
 
     }
 
     @Test
-    public void TC02(){
+    public void TC02() {
 //         * "EUR" ya göre en yüksek rate'in (en degerli paranin) ==>"GBP"para birimi oldugu ve
 //        rate'in ise  0.8765'oldugunu (verify)
 
         getResponse();
-        json=response.jsonPath();
-        Map<String,Integer> moneyRateList = new HashMap<>();
+        json = response.jsonPath();
+        Map<String, Float> allRates = json.getMap("rates");
 
-        for (int i=1;i<32;i++) {
+        float euro = 1.0F;
+        for (String currencyKey : allRates.keySet()) {
+            float rate = allRates.get(currencyKey);
 
-
+            if (currencyKey.toUpperCase().equals("GBP")) {
+                Assert.assertTrue(euro > rate);
+            } else {
+                Assert.assertTrue(euro < rate);
+            }
         }
-
-        System.out.println(moneyRateList);
-
-  //      Assert.assertEquals(response.getContentType(),"application/json; charset=utf-8");
-
-
-
-
     }
-
-
-
-
-
-
 
 
 }
