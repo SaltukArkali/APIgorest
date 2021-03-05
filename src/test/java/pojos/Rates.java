@@ -70,6 +70,8 @@ public class Rates {
     private Float kRW;
     @JsonProperty("MYR")
     private Float mYR;
+    @JsonProperty("EUR")
+    private Float eUR;
 
     /**
      * No args constructor for use in serialization
@@ -113,7 +115,7 @@ public class Rates {
      * @param tRY
      * @param rUB
      */
-    public Rates(Float cAD, Float hKD, Float iSK, Float pHP, Float dKK, Float hUF, Float cZK, Float aUD, Float rON, Float sEK, Float iDR, Float iNR, Float bRL, Float rUB, Float hRK, Float jPY, Float tHB, Float cHF, Float sGD, Float pLN, Float bGN, Float tRY, Float cNY, Float nOK, Float nZD, Float zAR, Float uSD, Float mXN, Float iLS, Float gBP, Float kRW, Float mYR) {
+    public Rates(Float cAD, Float hKD, Float iSK, Float pHP, Float dKK, Float hUF, Float cZK, Float aUD, Float rON, Float sEK, Float iDR, Float iNR, Float bRL, Float rUB, Float hRK, Float jPY, Float tHB, Float cHF, Float sGD, Float pLN, Float bGN, Float tRY, Float cNY, Float nOK, Float nZD, Float zAR, Float uSD, Float mXN, Float iLS, Float gBP, Float kRW, Float mYR, Float eUR) {
         super();
         this.cAD = cAD;
         this.hKD = hKD;
@@ -147,6 +149,7 @@ public class Rates {
         this.gBP = gBP;
         this.kRW = kRW;
         this.mYR = mYR;
+        this.eUR = eUR;
     }
 
     @JsonProperty("CAD")
@@ -469,9 +472,19 @@ public class Rates {
         this.mYR = mYR;
     }
 
+    @JsonProperty("EUR")
+    public Float getEUR() {
+        return eUR;
+    }
+
+    @JsonProperty("EUR")
+    public void setEUR(Float eUR) {
+        this.eUR = eUR;
+    }
+
     @Override
     public String toString() {
-        return new ToStringBuilder(this).append("cAD", cAD).append("hKD", hKD).append("iSK", iSK).append("pHP", pHP).append("dKK", dKK).append("hUF", hUF).append("cZK", cZK).append("aUD", aUD).append("rON", rON).append("sEK", sEK).append("iDR", iDR).append("iNR", iNR).append("bRL", bRL).append("rUB", rUB).append("hRK", hRK).append("jPY", jPY).append("tHB", tHB).append("cHF", cHF).append("sGD", sGD).append("pLN", pLN).append("bGN", bGN).append("tRY", tRY).append("cNY", cNY).append("nOK", nOK).append("nZD", nZD).append("zAR", zAR).append("uSD", uSD).append("mXN", mXN).append("iLS", iLS).append("gBP", gBP).append("kRW", kRW).append("mYR", mYR).toString();
+        return new ToStringBuilder(this).append("cAD", cAD).append("hKD", hKD).append("iSK", iSK).append("pHP", pHP).append("dKK", dKK).append("hUF", hUF).append("cZK", cZK).append("aUD", aUD).append("rON", rON).append("sEK", sEK).append("iDR", iDR).append("iNR", iNR).append("bRL", bRL).append("rUB", rUB).append("hRK", hRK).append("jPY", jPY).append("tHB", tHB).append("cHF", cHF).append("sGD", sGD).append("pLN", pLN).append("bGN", bGN).append("tRY", tRY).append("cNY", cNY).append("nOK", nOK).append("nZD", nZD).append("zAR", zAR).append("uSD", uSD).append("mXN", mXN).append("iLS", iLS).append("gBP", gBP).append("kRW", kRW).append("mYR", mYR).append("eUR", eUR).toString();
     }
 
 }

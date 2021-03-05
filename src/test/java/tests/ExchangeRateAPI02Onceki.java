@@ -9,9 +9,7 @@ import org.junit.Test;
 import org.testng.Assert;
 import pojos.Money;
 import pojos.Rates;
-
 import java.util.Map;
-
 import static io.restassured.RestAssured.given;
 
 public class ExchangeRateAPI02Onceki {
