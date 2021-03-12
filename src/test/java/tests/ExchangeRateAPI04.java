@@ -15,9 +15,6 @@ public class ExchangeRateAPI04 {
     Response response;
     String endPoint = "https://api.exchangeratesapi.io/2021-02-25/?base=USD";
     JsonPath json;
-    Money2 money;
-    Rates2 rates;
-    ObjectMapper objectMapper = new ObjectMapper();
 
     public void getResponse() {
         response = given().accept(ContentType.JSON).when().get(endPoint);
